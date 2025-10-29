@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Web</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="assistant-container">
+        <header>
+            <h1>Asistente Personal</h1>
+            <div class="status-light" id="status-light"></div>
+        </header>
+
+        <div class="response-area" id="response-area">
+            Hola, ¿en qué puedo ayudarte?
+        </div>
+
+        <div class="button-grid">
+            <button id="btnHora">¿Qué hora es?</button>
+            <button id="btnClima">¿Cómo está el clima?</button>
+            <button id="btnAlarma">Alarma (10 seg)</button>
+        </div>
+    </div>
+
+    <audio id="alarm-sound" src="https://www.soundjay.com/buttons/beep-07a.mp3" preload="auto"></audio>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
