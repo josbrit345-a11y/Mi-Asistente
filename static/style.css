@@ -79,11 +79,10 @@ button:active {
     transform: scale(1.05);
 }
 
-/* 2. Animación de "Aparecer" para el Texto */
 .response-area {
-    /* Por defecto, está oculto */
-    opacity: 0;
-    transform: translateY(10px);
+    opacity: 2;
+    transform: translateY(5px);
+    background: #0214226e;
     
     /* La transición suave */
     transition: opacity 0.3s ease-out, transform 0.3s ease-out;
