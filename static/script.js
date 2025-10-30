@@ -2,26 +2,51 @@
 
 // --- 1. Referencias a los elementos HTML ---
 // Usamos 'const' porque estas variables no cambiarán
+
 const responseArea = document.getElementById('response-area');
 const btnHora = document.getElementById('btnHora');
 const btnClima = document.getElementById('btnClima');
 const btnAlarma = document.getElementById('btnAlarma');
 const alarmSound = document.getElementById('alarm-sound');
+const avatar = document.getElementById('avatar-img');
 
-// --- 2. Función Central para "Hablar" ---
 function speak(message) {
-    // Actualiza el texto en la pantalla
+    // 1. Pone el texto en la burbuja
     responseArea.textContent = message;
 
-    // Intenta usar la voz del navegador
+    // 2. Inicia las animaciones
+    avatar.classList.add('speaking');
+    responseArea.classList.add('visible');
+
+    // 3. Prepara la voz
     try {
         if ('speechSynthesis' in window) {
             const utterance = new SpeechSynthesisUtterance(message);
-            utterance.lang = 'es-ES'; // Configura el idioma
+            utterance.lang = 'es-ES';
+            
+            // 4. (LO MÁS IMPORTANTE)
+            // Qué hacer cuando la voz TERMINE de hablar:
+            utterance.onend = function() {
+                // Quita las animaciones
+                avatar.classList.remove('speaking');
+                responseArea.classList.remove('visible');
+            }
+            
+            // 5. Habla
             window.speechSynthesis.speak(utterance);
+        } else {
+            // Si el navegador no soporta voz, al menos muestra el texto
+            // y quita las animaciones después de 5 segundos.
+            setTimeout(() => {
+                avatar.classList.remove('speaking');
+                responseArea.classList.remove('visible');
+            }, 5000);
         }
     } catch (e) {
         console.error("Error al usar la síntesis de voz:", e);
+        // Asegúrate de apagar las animaciones si hay un error
+        avatar.classList.remove('speaking');
+        responseArea.classList.remove('visible');
     }
 }
 

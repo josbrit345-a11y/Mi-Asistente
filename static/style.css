@@ -69,3 +69,33 @@ button:hover {
 button:active {
     transform: scale(0.98);
 }
+
+/* 1. Animación de "Brillo" para el Avatar */
+.avatar-img.speaking {
+    /* Crea un "resplandor" usando la sombra (glow) */
+    box-shadow: 0 0 25px #00aaff, 0 0 10px #00ffff;
+    
+    /* Pequeño pulso para que se vea "vivo" */
+    transform: scale(1.05);
+}
+
+/* 2. Animación de "Aparecer" para el Texto */
+.response-area {
+    /* Por defecto, está oculto */
+    opacity: 0;
+    transform: translateY(10px);
+    
+    /* La transición suave */
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.response-area.visible {
+    /* La clase 'visible' lo hace aparecer */
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 3. Transición suave para el avatar también */
+.avatar-img {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
