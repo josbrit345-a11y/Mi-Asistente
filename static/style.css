@@ -34,67 +34,50 @@ header h1 {
     color: #00aaff; /* Color acento */
 }
 
-.response-area {
-    min-height: 100px;
-    padding: 1.5rem;
-    font-size: 1.2rem;
-    line-height: 1.6;
-    text-align: center;
-    background: #252525;
-    border-bottom: 1px solid #333;
-}
-
-.button-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1.5rem;
-}
-
-button {
-    font-size: 1rem;
+.chat-form {
+    display: flex; /* Pone el input y el botón en línea */
     padding: 1rem;
+    background: #2a2a2a; /* Fondo oscuro para la barra de chat */
+    border-top: 1px solid #333;
+}
+
+#user-input {
+    flex-grow: 1; /* Hace que el input ocupe todo el espacio disponible */
     border: none;
-    border-radius: 8px;
-    background: #08417e;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 20px;
+    background: #333;
+    color: #e0e0e0;
+    outline: none; /* Quita el borde azul al hacer clic */
+    transition: box-shadow 0.3s ease;
+}
+
+#user-input:focus {
+    background: #444;
+    box-shadow: 0 0 10px #00aaff; /* Brillo al seleccionar */
+}
+
+#send-button {
+    flex-shrink: 0; /* Evita que el botón se encoja */
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%; /* Botón redondo */
+    background: #007bff;
     color: white;
+    margin-left: 0.75rem;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     transition: background-color 0.3s, transform 0.1s;
 }
 
-button:hover {
+#send-button:hover {
     background: #0056b3;
 }
 
-button:active {
-    transform: scale(0.98);
-}
-
-/* 1. Animación de "Brillo" para el Avatar */
-.avatar-img.speaking {
-    /* Crea un "resplandor" usando la sombra (glow) */
-    box-shadow: 0 0 25px #00aaff, 0 0 10px #00ffff;
-    
-    /* Pequeño pulso para que se vea "vivo" */
-    transform: scale(1.05);
-}
-
-.response-area {
-    opacity: 2;
-    transform: translateY(5px);
-    background: #0214226e;
-    
-    /* La transición suave */
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-}
-
-.response-area.visible {
-    /* La clase 'visible' lo hace aparecer */
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 3. Transición suave para el avatar también */
-.avatar-img {
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+#send-button:active {
+    transform: scale(0.95);
 }

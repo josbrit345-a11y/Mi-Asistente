@@ -3,56 +3,87 @@ import os
 from flask import Flask, render_template, jsonify, request
 import requests
 
-# 1. Inicializa la aplicación Flask
+# --- NUEVAS IMPORTACIONES DE IA ---
+import google.generativeai as genai
+
 app = Flask(__name__)
 
-# 2. Tu clave secreta de OpenWeatherMap
-# ¡NUNCA compartas esta clave!
-API_KEY = "d381551tarifa2293951685cd50abada3a7"
+# --- CONFIGURACIÓN DE LAS API KEYS ---
+# (Cargadas desde las variables de entorno de Render)
 
-# --- RUTA 1: La Página Principal ---
+# Clave de OpenWeatherMap (ya la tienes)
+WEATHER_API_KEY = os.getenv('API_KEY') 
+
+# NUEVA CLAVE: Clave de Google AI
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+genai.configure(api_key=GOOGLE_API_KEY)
+
+# --- INICIALIZACIÓN DEL MODELO DE IA ---
+# (Lo preparamos para que esté listo para responder)
+try:
+    model = genai.GenerativeModel('gemini-1.5-pro-latest')
+except Exception as e:
+    print(f"Error al inicializar el modelo de IA: {e}")
+    model = None
+
+# --- RUTA 1: La Página Principal (Sin cambios) ---
 @app.route('/')
 def index():
-    """
-    Esta función se ejecuta cuando alguien visita la raíz (http://.../)
-    Busca el archivo 'index.html' en la carpeta 'templates' y lo envía.
-    """
     return render_template('index.html')
 
-# --- RUTA 2: La API del Clima ---
+# --- RUTA 2: La API del Clima (Con un pequeño ajuste) ---
 @app.route('/api/weather')
 def get_weather():
-    """
-    Esta función es una API interna. El JavaScript la llamará.
-    """
-    # Usamos 'Caracas' como ciudad por defecto, ya que estás en Venezuela
-    city = request.args.get('city', 'Caracas') 
-
+    city = request.args.get('city', 'Caracas')
+    
+    if not WEATHER_API_KEY:
+        return jsonify({"error": "Clave API del clima no configurada"}), 500
+        
     try:
-        # 3. Construye la URL para llamar a OpenWeatherMap
-        # 'units=metric' es para Celsius, 'lang=es' para español.
-        url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric&lang=es'
-
-        # 4. Llama a la API
+        url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={WEATHER_API_KEY}&units=metric&lang=es'
         response = requests.get(url)
-        response.raise_for_status() # Lanza un error si la llamada falló
         data = response.json()
-
-        # 5. Filtra y devuelve solo los datos que necesitamos
-        weather_data = {
-            "temp": data['main']['temp'],
-            "description": data['weather'][0]['description'].capitalize()
-        }
-        return jsonify(weather_data)
-
-    except requests.exceptions.HTTPError as err:
-        if response.status_code == 404:
+        
+        if response.status_code == 200:
+            weather_data = {
+                "temp": data['main']['temp'],
+                "description": data['weather'][0]['description'].capitalize()
+            }
+            return jsonify(weather_data)
+        else:
             return jsonify({"error": "Ciudad no encontrada"}), 404
-        return jsonify({"error": str(err)}), 500
+    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# 6. El punto de entrada para ejecutar el servidor
+# --- RUTA 3: ¡NUEVA RUTA DE IA! ---
+@app.route('/api/ask', methods=['POST'])
+def ask_ai():
+    """
+    Recibe una pregunta del frontend, la envía a Gemini
+    y devuelve la respuesta.
+    """
+    if not model:
+        return jsonify({"answer": "Lo siento, mi cerebro de IA no está conectado."}), 500
+    
+    try:
+        # Obtiene la pregunta del JSON enviado por el frontend
+        data = request.json
+        question = data.get('question')
+
+        if not question:
+            return jsonify({"answer": "No recibí ninguna pregunta."}), 400
+
+        # Envía la pregunta a Gemini
+        response = model.generate_content(question)
+        
+        # Devuelve solo el texto de la respuesta
+        return jsonify({"answer": response.text})
+
+    except Exception as e:
+        print(f"Error al generar respuesta de IA: {e}")
+        return jsonify({"answer": "Tuve un problema al pensar la respuesta."}), 500
+
+# --- Punto de entrada (Sin cambios) ---
 if __name__ == '__main__':
-    # 'host=0.0.0.0' hace que sea accesible desde otros dispositivos en tu red
     app.run(debug=True, host='0.0.0.0', port=5000)
